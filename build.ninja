@@ -1,0 +1,48 @@
+ninja_required_version = 1.5
+
+build_dir = build
+target_dir = bin
+
+########################################
+
+cflags = -std=c++17 -O3 -march=native -pipe -Wall -Wextra -Wconversion -Wpedantic -Wno-sign-compare -fPIC -flto -s
+linkflags = $cflags -pie -Wl,--enable-new-dtags,-rpath="\$$ORIGIN",-rpath="\$$ORIGIN/lib"
+
+rule cc
+    description = Compiling $in
+    command = c++ $cflags -MMD -MF $out.d -c -o $out $in
+    depfile = $out.d
+    # deps = gcc
+
+rule link
+    description = Linking $in
+    command = c++ $linkflags -o $out $in $libs -lpthread -ldl
+
+########################################
+
+rule run
+    command = ./$in
+    pool = console
+    description = Running $in
+
+########################################
+
+build $target_dir/main.x: link $build_dir/main.o | $target_dir/baz.so
+build $build_dir/main.o: cc src/main.cxx
+default $target_dir/main.x
+
+build $target_dir/baz.so: link $build_dir/baz.o
+    linkflags = $linkflags -shared
+build $build_dir/baz.o: cc src/baz.cxx
+build baz.so: phony $target_dir/baz.so
+default $target_dir/baz.so
+
+build $target_dir/foo.so: link $build_dir/foo.o
+    linkflags = $linkflags -shared
+build $build_dir/foo.o: cc src/foo.cxx
+build foo.so: phony $target_dir/foo.so
+default $target_dir/foo.so
+
+########################################
+
+build run: run $target_dir/main.x $target_dir/baz.so foo.so
