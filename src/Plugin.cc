@@ -32,12 +32,14 @@ Plugin::Plugin(const std::string name)
 	}
 
 	m_plugin = m_create();
+	if (!m_plugin)
+		throw std::runtime_error("Creating " + name + " failed");
 }
 
 Plugin::~Plugin()
 {
-    m_destroy(m_plugin);
-    dlclose(m_handle);
+	m_destroy(m_plugin);
+	dlclose(m_handle);
 }
 
 void Plugin::test()

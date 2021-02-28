@@ -19,7 +19,7 @@ rule cc
 
 rule cclink
     description = Linking $in
-    command = c++ $cxxflags $linkflags -o $out $in $libs -lpthread -ldl
+    command = c++ $cxxflags $linkflags -o $out $in $libs
 
 rule c
     description = Compiling $in
@@ -28,7 +28,7 @@ rule c
 
 rule clink
     description = Linking $in
-    command = cc $cflags $linkflags -o $out $in $libs -lpthread -ldl
+    command = cc $cflags $linkflags -o $out $in $libs
 
 rule rustc
     description = Compiling $in
@@ -46,6 +46,7 @@ rule run
 
 build $target_dir/main.x: cclink $build_dir/main.o $build_dir/Plugin.o
     linkflags = $linkflags -Wl,--enable-new-dtags,-rpath="\$$ORIGIN",-rpath="\$$ORIGIN/lib"
+    libs = -ldl
 build $build_dir/main.o: cc src/main.cxx
 build $build_dir/Plugin.o: cc src/Plugin.cc
 default $target_dir/main.x
