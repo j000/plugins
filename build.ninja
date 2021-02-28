@@ -10,6 +10,8 @@ cxxflags = -std=c++17 $commonflags
 cflags = -std=c11 $commonflags
 linkflags = -pie
 
+rustflags = --edition 2018 --crate-type cdylib -C opt-level=3 -C incremental=$build_dir
+
 rule cc
     description = Compiling $in
     command = c++ $cxxflags -MMD -MF $out.d -c -o $out $in
@@ -30,7 +32,7 @@ rule clink
 
 rule rustc
     description = Compiling $in
-    command = rustc --edition 2018 --crate-type cdylib -C opt-level=3 -C lto -C rpath -C incremental=$build_dir $main -o $out
+    command = rustc $rustflags $main -o $out
 
 
 ########################################
