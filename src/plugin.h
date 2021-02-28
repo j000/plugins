@@ -1,15 +1,12 @@
 #ifndef PLUGIN_H
 #define PLUGIN_H
 
-class Plugin {
-public:
-	virtual ~Plugin(){};
-	virtual const char* name() const = 0;
-	virtual void test() = 0;
-};
+typedef struct Plugin_t Plugin_t;
 
-extern "C" Plugin* plugin_create();
+extern Plugin_t* plugin_create(void);
+extern void plugin_destroy(Plugin_t*);
 
-#define PLUGIN(X) X plugin_tmp{}; Plugin* plugin_create(){return &plugin_tmp;}
+extern void plugin_test(Plugin_t*);
+extern const char* plugin_name(Plugin_t*);
 
 #endif /* PLUGIN_H */

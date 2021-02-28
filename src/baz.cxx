@@ -1,26 +1,32 @@
+extern "C" {
 #include "plugin.h"
+}
 #include <iostream>
 
-class Baz : public Plugin {
-	const char* const m_name = "Baz";
-
-public:
-	Baz()
-	{
-        std::cout << "    " << m_name << " created" << std::endl;
-	};
-	~Baz()
-	{
-        std::cout << "    " << m_name << " destroyed" << std::endl;
-	};
-	virtual const char* name() const
-	{
-		return m_name;
-	}
-	virtual void test()
-	{
-        std::cout << "    " << m_name << " tested" << std::endl;
-	};
+struct Plugin_t {
+	std::string name{};
 };
 
-PLUGIN(Baz)
+Plugin_t* plugin_create(void)
+{
+	std::cout << "    baz created" << std::endl;
+	auto tmp = new Plugin_t();
+	tmp->name = "baz";
+	return tmp;
+}
+
+void plugin_destroy(Plugin_t* plug)
+{
+	std::cout << "    baz destroyed" << std::endl;
+	delete plug;
+}
+
+void plugin_test(Plugin_t* plug)
+{
+	std::cout << "    " << plug->name << " tested" << std::endl;
+}
+
+const char* plugin_name(Plugin_t* plug)
+{
+	return plug->name.c_str();
+}

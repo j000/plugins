@@ -1,17 +1,20 @@
+extern "C" {
 #include "plugin.h"
+}
 #include <iostream>
 
-class Foo : public Plugin {
-	const char* const m_name = "Foo";
+struct Plugin_t {
+private:
+	const char* const m_name = "foo";
 
 public:
-	Foo()
+	Plugin_t()
 	{
-        std::cout << "    " << m_name << " created" << std::endl;
+		std::cout << "    " << m_name << " created" << std::endl;
 	};
-	~Foo()
+	virtual ~Plugin_t()
 	{
-        std::cout << "    " << m_name << " destroyed" << std::endl;
+		std::cout << "    " << m_name << " destroyed" << std::endl;
 	};
 	virtual const char* name() const
 	{
@@ -19,8 +22,27 @@ public:
 	}
 	virtual void test()
 	{
-        std::cout << "    " << m_name << " tested" << std::endl;
+		std::cout << "    " << m_name << " tested" << std::endl;
 	};
 };
 
-PLUGIN(Foo)
+Plugin_t* plugin_create(void)
+{
+	Plugin_t* tmp = new Plugin_t{};
+	return tmp;
+}
+
+void plugin_destroy(Plugin_t* plug)
+{
+	delete plug;
+}
+
+void plugin_test(Plugin_t* plug)
+{
+	plug->test();
+}
+
+const char* plugin_name(Plugin_t* plug)
+{
+	return plug->name();
+}

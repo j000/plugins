@@ -5,18 +5,29 @@ target_dir = bin
 
 ########################################
 
-cflags = -std=c++17 -O3 -march=native -pipe -Wall -Wextra -Wconversion -Wpedantic -Wno-sign-compare -fPIC -flto -s
-linkflags = $cflags -pie -Wl,--enable-new-dtags,-rpath="\$$ORIGIN",-rpath="\$$ORIGIN/lib"
+commonflags = -O3 -march=native -pipe -Wall -Wextra -Wconversion -Wpedantic -Wno-sign-compare -fPIC -flto -s
+cxxflags = -std=c++17 $commonflags
+cflags = -std=c11 $commonflags
+linkflags = -pie
 
 rule cc
     description = Compiling $in
-    command = c++ $cflags -MMD -MF $out.d -c -o $out $in
+    command = c++ $cxxflags -MMD -MF $out.d -c -o $out $in
     depfile = $out.d
-    # deps = gcc
 
-rule link
+rule cclink
     description = Linking $in
-    command = c++ $linkflags -o $out $in $libs -lpthread -ldl
+    command = c++ $cxxflags $linkflags -o $out $in $libs -lpthread -ldl
+
+rule c
+    description = Compiling $in
+    command = cc $cflags -MMD -MF $out.d -c -o $out $in
+    depfile = $out.d
+
+rule clink
+    description = Linking $in
+    command = cc $cflags $linkflags -o $out $in $libs -lpthread -ldl
+
 
 ########################################
 
@@ -27,22 +38,30 @@ rule run
 
 ########################################
 
-build $target_dir/main.x: link $build_dir/main.o | $target_dir/baz.so
+build $target_dir/main.x: cclink $build_dir/main.o $build_dir/Plugin.o
+    linkflags = $linkflags -Wl,--enable-new-dtags,-rpath="\$$ORIGIN",-rpath="\$$ORIGIN/lib"
 build $build_dir/main.o: cc src/main.cxx
+build $build_dir/Plugin.o: cc src/Plugin.cc
 default $target_dir/main.x
 
-build $target_dir/baz.so: link $build_dir/baz.o
+build $target_dir/baz.so: cclink $build_dir/baz.o
     linkflags = $linkflags -shared
 build $build_dir/baz.o: cc src/baz.cxx
 build baz.so: phony $target_dir/baz.so
 default $target_dir/baz.so
 
-build $target_dir/foo.so: link $build_dir/foo.o
+build $target_dir/foo.so: cclink $build_dir/foo.o
     linkflags = $linkflags -shared
 build $build_dir/foo.o: cc src/foo.cxx
 build foo.so: phony $target_dir/foo.so
 default $target_dir/foo.so
 
+build $target_dir/bar.so: clink $build_dir/bar.o
+    linkflags = $linkflags -shared
+build $build_dir/bar.o: c src/bar.c
+build bar.so: phony $target_dir/bar.so
+default $target_dir/bar.so
+
 ########################################
 
-build run: run $target_dir/main.x $target_dir/baz.so foo.so
+build run: run $target_dir/main.x $target_dir/baz.so foo.so bar.so
