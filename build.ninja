@@ -74,6 +74,14 @@ build $target_dir/rust.so: rustc src/rust.rs
 build rust.so: phony $target_dir/rust.so
 default $target_dir/rust.so
 
+build $target_dir/lua.so: clink $build_dir/lua.o
+    linkflags = $linkflags -shared
+    libs = -lluajit-5.1 -llua5.1
+build $build_dir/lua.o: c src/lua.c
+    cflags = $cflags -lluajit -llua5.1
+build lua.so: phony $target_dir/lua.so
+default $target_dir/lua.so
+
 ########################################
 
-build run: run $target_dir/main.x $target_dir/baz.so foo.so bar.so rust.so
+build run: run $target_dir/main.x $target_dir/baz.so foo.so bar.so rust.so lua.so
