@@ -28,6 +28,10 @@ rule clink
     description = Linking $in
     command = cc $cflags $linkflags -o $out $in $libs -lpthread -ldl
 
+rule rustc
+    description = Compiling $in
+    command = rustc --edition 2018 --crate-type cdylib -C opt-level=3 -C lto -C rpath -C incremental=$build_dir $main -o $out
+
 
 ########################################
 
@@ -62,6 +66,11 @@ build $build_dir/bar.o: c src/bar.c
 build bar.so: phony $target_dir/bar.so
 default $target_dir/bar.so
 
+build $target_dir/rust.so: rustc src/rust.rs
+    main = src/rust.rs
+build rust.so: phony $target_dir/rust.so
+default $target_dir/rust.so
+
 ########################################
 
-build run: run $target_dir/main.x $target_dir/baz.so foo.so bar.so
+build run: run $target_dir/main.x $target_dir/baz.so foo.so bar.so rust.so
