@@ -5,7 +5,8 @@ extern "C" {
 
 struct Plugin_t {
 private:
-	const char* const m_name = "foo";
+	const char* const m_name{"foo"};
+	int m_counter{0};
 
 public:
 	Plugin_t()
@@ -22,7 +23,8 @@ public:
 	}
 	virtual void test()
 	{
-		std::cout << "    " << m_name << " tested" << std::endl;
+		std::cout << "    " << m_name << " tested " << m_counter++ << " times"
+				  << std::endl;
 	};
 };
 

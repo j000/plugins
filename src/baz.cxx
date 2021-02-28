@@ -23,7 +23,9 @@ void plugin_destroy(Plugin_t* plug)
 
 void plugin_test(Plugin_t* plug)
 {
-	std::cout << "    " << plug->name << " tested" << std::endl;
+	static int counter = 0;
+	std::cout << "    " << plug->name << " tested " << counter++ << " times"
+			  << std::endl;
 }
 
 const char* plugin_name(Plugin_t* plug)

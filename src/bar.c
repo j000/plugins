@@ -22,7 +22,8 @@ void plugin_destroy(Plugin_t* plug)
 
 void plugin_test(Plugin_t* plug)
 {
-	printf("    %s tested\n", plug->name);
+	static int counter = 0;
+	printf("    %s tested %d times\n", plug->name, counter++);
 }
 
 const char* plugin_name(Plugin_t* plug)

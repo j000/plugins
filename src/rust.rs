@@ -1,3 +1,5 @@
+use std::sync::atomic::{AtomicU32, Ordering};
+
 #[allow(non_camel_case_types)]
 pub struct Plugin_t {
     name: String,
@@ -47,5 +49,8 @@ fn plugin_test(plug_u: *mut Plugin_t) {
     unsafe {
         plug = plug_u.as_ref().unwrap();
     }
-    println!("    {} tested", plug.name);
+
+    static COUNTER: AtomicU32 = AtomicU32::new(0);
+
+    println!("    {} tested {} times", plug.name, COUNTER.fetch_add(1, Ordering::Relaxed));
 }
