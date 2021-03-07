@@ -5,10 +5,11 @@ target_dir = bin
 
 ########################################
 
-commonflags = -O3 -march=native -pipe -Wall -Wextra -Wconversion -Wpedantic -Wno-sign-compare -fPIC -flto -s
+warnings = -Wall -Wextra -Wconversion -Wpedantic -Wno-sign-compare
+commonflags = -O3 -march=native -pipe $warnings -fPIC -flto
 cxxflags = -std=c++17 $commonflags
 cflags = -std=c11 $commonflags
-linkflags = -pie
+linkflags = -pie -s
 
 rustflags = --edition 2018 --crate-type cdylib -C opt-level=3 -C incremental=$build_dir
 
