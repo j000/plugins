@@ -6,30 +6,22 @@
 #include <luajit-2.0/lua.h>
 #include <luajit-2.0/lualib.h>
 
-#define QUOTE(...) #__VA_ARGS__
+#define INCSTRING(name, file) \
+    __asm__(".section .rodata\n" \
+            ".global incbin_" #name "_start\n" \
+            ".balign 16\n" \
+            "incbin_" #name "_start:\n" \
+            ".incbin \"" file "\"\n" \
+            ".global incbin_" #name "_end\n" \
+            ".balign 1\n" \
+            "incbin_" #name "_end:\n" \
+            ".byte 0\n" \
+    ); \
+    extern const __attribute__((aligned(16))) void* incbin_ ## name ## _start; \
+    extern const void* incbin_ ## name ## _end; \
+	const char* script = (char*)&incbin_ ## name ## _start;
 
-static const char* script = QUOTE(
-	// clang-format off
-function plugin_create()
-	io.write("    lua created\n")
-end
-
-function plugin_destroy()
-	io.write("    lua destroyed\n")
-end
-
-function plugin_name()
-	return "lua"
-end
-
-counter = 0
-
-function plugin_test()
-	io.write("    lua tested " .. counter .. " times\n")
-	counter = counter + 1
-end
-	// clang-format on
-);
+INCSTRING(script, "plugin.lua")
 
 struct Plugin_t {
 	char* name;

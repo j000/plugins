@@ -75,10 +75,11 @@ build rust.so: phony $target_dir/rust.so
 default $target_dir/rust.so
 
 build $target_dir/lua.so: clink $build_dir/lua.o
-    linkflags = $linkflags -shared
+    linkflags = $linkflags -shared -Wa,-I./src/
+# pass -I to assebler, fix for lto
     libs = -lluajit-5.1 -llua5.1
 build $build_dir/lua.o: c src/lua.c
-    cflags = $cflags -lluajit -llua5.1
+    cflags = $cflags -I./src/ -lluajit -llua5.1
 build lua.so: phony $target_dir/lua.so
 default $target_dir/lua.so
 
